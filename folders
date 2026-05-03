@@ -3,3 +3,27 @@ src/app/admin/chinese-wall/
   chinese-wall.component.scss
   chinese-wall.component.ts
   chinese-wall.component.spec.ts
+
+
+Update admin.component.html
+
+<mat-card class="admin-option" role="button" tabindex="0" (click)="navigateToChineseWall()" aria-label="Chinese Wall">
+  <mat-icon>open_in_new</mat-icon>
+  <span>Chinese Wall</span>
+</mat-card>
+
+Update admin.component.ts
+
+navigateToChineseWall() {
+  this.router.navigate(['/beagle/chinese-wall/entity-user-mapping']);
+}
+
+Update app.routes.ts
+
+Import:
+
+import { ChineseWallComponent } from './admin/chinese-wall/chinese-wall.component';
+
+Add inside beagle children:
+
+{ path: 'chinese-wall/:tab', component: ChineseWallComponent },
