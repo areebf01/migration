@@ -1,0 +1,5 @@
+src/app/admin/chinese-wall/
+  chinese-wall.component.html
+  chinese-wall.component.scss
+  chinese-wall.component.ts
+  chinese-wall.component.spec.ts
