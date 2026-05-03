@@ -1,0 +1,224 @@
+<div class="chinese-wall-page">
+
+  <div class="cw-sidebar">
+    <h3>Chinese Wall Management</h3>
+
+    <mat-form-field appearance="outline" class="sidebar-search">
+      <input matInput placeholder="Search..." [(ngModel)]="sidebarSearch">
+    </mat-form-field>
+
+    <mat-nav-list>
+      <a
+        mat-list-item
+        *ngFor="let item of filteredSidebarItems"
+        [routerLink]="item.route"
+        [class.active]="activeTab === item.tab">
+        {{ item.name }}
+      </a>
+    </mat-nav-list>
+  </div>
+
+  <div class="cw-content">
+
+    <app-warning-banner [hasSidebar]="true" role="alert" aria-live="polite"></app-warning-banner>
+
+    <mat-card class="page-header">
+      <mat-card-title>
+        <mat-icon>tune</mat-icon>
+        Manage {{ activeTab === 'entity-user-mapping' ? 'Entity-User Mapping' : 'Chinese Wall Access Rights' }}
+      </mat-card-title>
+    </mat-card>
+
+    <mat-card class="section-card">
+      <div class="section-header">
+        <mat-icon>filter_alt</mat-icon>
+        Filter Parameters
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-label">Entity</div>
+
+        <mat-form-field appearance="fill" class="filter-field">
+          <input matInput placeholder="Entity" [(ngModel)]="filterEntity">
+        </mat-form-field>
+
+        <button mat-raised-button class="small-btn" (click)="filter()">Filter</button>
+      </div>
+    </mat-card>
+
+    <ng-container *ngIf="activeTab === 'entity-user-mapping'">
+
+      <div class="pagination-text">Page 1 of 1 ({{ filteredMappings.length }} Entity-User Mappings)</div>
+
+      <mat-card class="section-card">
+        <div class="section-header">
+          <mat-icon>edit</mat-icon>
+          Modify Existing Entity-User Mapping
+        </div>
+
+        <table class="cw-table">
+          <thead>
+            <tr>
+              <th>Entity</th>
+              <th>Beagle User</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <ng-container *ngFor="let item of filteredMappings">
+              <tr>
+                <td [attr.rowspan]="item.users.length">{{ item.entity }}</td>
+                <td>{{ item.users[0] }}</td>
+                <td [attr.rowspan]="item.users.length" class="action-cell">
+                  <button mat-icon-button color="primary" (click)="editMapping(item)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+
+                  <button mat-icon-button color="warn" (click)="deleteMapping(item.id)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </tr>
+
+              <tr *ngFor="let user of item.users.slice(1)">
+                <td>{{ user }}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </mat-card>
+
+      <div class="pagination-text">Page 1 of 1 ({{ filteredMappings.length }} Entity-User Mappings)</div>
+
+      <mat-card class="section-card">
+        <div class="section-header">
+          <mat-icon>add_circle</mat-icon>
+          Add New Mapping
+        </div>
+
+        <table class="cw-table add-table">
+          <thead>
+            <tr>
+              <th>Entity</th>
+              <th>Beagle User</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>
+                <mat-form-field appearance="fill" class="full-width">
+                  <input matInput placeholder="Chinese Wall entity" [(ngModel)]="newEntity">
+                </mat-form-field>
+              </td>
+
+              <td>
+                <div class="user-add-row">
+                  <mat-form-field appearance="fill" class="user-input">
+                    <input matInput placeholder="Chinese User" [(ngModel)]="newChineseUser">
+                  </mat-form-field>
+
+                  <button mat-raised-button class="small-btn" type="button" (click)="addUserToList()">
+                    <mat-icon>add_circle</mat-icon>
+                    Add
+                  </button>
+                </div>
+
+                <div class="user-add-row">
+                  <select class="user-list" size="4" [(ngModel)]="selectedUser">
+                    <option *ngFor="let user of selectedUsers" [value]="user">
+                      {{ user }}
+                    </option>
+                  </select>
+
+                  <button mat-raised-button color="warn" class="remove-btn" type="button" (click)="removeSelectedUser()">
+                    <mat-icon>delete</mat-icon>
+                    Remove
+                  </button>
+                </div>
+              </td>
+
+              <td>
+                <button mat-raised-button class="small-btn" type="button" (click)="addMapping()">
+                  <mat-icon>add_circle</mat-icon>
+                  Add
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </mat-card>
+
+    </ng-container>
+
+    <ng-container *ngIf="activeTab === 'access-rights'">
+
+      <div class="pagination-text">Page 1 of 1 ({{ filteredAccessRights.length }} Chinese Wall Access Rights)</div>
+
+      <mat-card class="section-card">
+        <div class="section-header">
+          <mat-icon>edit</mat-icon>
+          Modify Existing Chinese Wall Access Rights
+        </div>
+
+        <table class="cw-table">
+          <thead>
+            <tr>
+              <th>Entity</th>
+              <th>Private - Correspondence</th>
+              <th>Private - Executed Documentation</th>
+              <th>Private - MAOS Data</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let item of filteredAccessRights">
+              <td>{{ item.entity }}</td>
+
+              <td>
+                <mat-checkbox [(ngModel)]="item.correspondence" [disabled]="!item.editing"></mat-checkbox>
+              </td>
+
+              <td>
+                <mat-checkbox [(ngModel)]="item.executedDocumentation" [disabled]="!item.editing"></mat-checkbox>
+              </td>
+
+              <td>
+                <mat-checkbox [(ngModel)]="item.maos" [disabled]="!item.editing"></mat-checkbox>
+              </td>
+
+              <td class="action-cell">
+                <ng-container *ngIf="!item.editing">
+                  <button mat-icon-button color="primary" (click)="makeEditable(item)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </ng-container>
+
+                <ng-container *ngIf="item.editing">
+                  <button mat-raised-button class="small-btn" (click)="saveAccessRight(item)">
+                    <mat-icon>save</mat-icon>
+                    Save
+                  </button>
+
+                  <button mat-raised-button color="warn" class="remove-btn" (click)="cancelAccessRight(item)">
+                    <mat-icon>cancel</mat-icon>
+                    Cancel
+                  </button>
+                </ng-container>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </mat-card>
+
+      <div class="pagination-text">Page 1 of 1 ({{ filteredAccessRights.length }} Chinese Wall Access Rights)</div>
+
+    </ng-container>
+
+    <div class="footer-text">Version 32.0 | About</div>
+
+  </div>
+</div>
